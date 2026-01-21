@@ -24,12 +24,18 @@ public class MyApplication {
         while (true) {
             System.out.println();
             System.out.println("1. Show movies");
+            System.out.println("2. Register");
+            System.out.println("3. Login");
             System.out.println("0. Exit");
             System.out.print("Choose: ");
             String choice = scanner.nextLine().trim();
 
             if (choice.equals("1")) {
                 showMovies(connection);
+            } else if (choice.equals("2")) {
+                register(connection, scanner);
+            } else if (choice.equals("3")) {
+                login(connection, scanner);
             } else if (choice.equals("0")) {
                 break;
             }
@@ -49,5 +55,51 @@ public class MyApplication {
                 System.out.println(id + ". " + title + " (" + genre + ", " + duration + " min)");
             }
         }
+    }
+
+    private static void register(Connection connection, Scanner scanner) {
+        System.out.print("Name: ");
+        String name = scanner.nextLine().trim();
+        System.out.print("Surname: ");
+        String surname = scanner.nextLine().trim();
+        System.out.print("Username: ");
+        String username = scanner.nextLine().trim();
+        System.out.print("Password: ");
+        String password = scanner.nextLine().trim();
+
+        String sql = "INSERT INTO users (name, surname, username, password) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, name);
+            statement.setString(2, surname);
+            statement.setString(3, username);
+            statement.setString(4, password);
+            statement.executeUpdate();
+            System.out.println("Registered.");
+        } catch (SQLException e) {
+            System.out.println("Registration failed: " + e.getMessage());
+        }
+    }
+
+    private static void login(Connection connection, Scanner scanner) {
+        System.out.print("Username: ");
+        String username = scanner.nextLine().trim();
+        System.out.print("Password: ");
+        String password = scanner.nextLine().trim();
+
+        String sql = "SELECT id FROM users WHERE username = ? AND password = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setString(1, username);
+            statement.setString(2, password);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    System.out.println("Login successful. User id: " + rs.getInt("id"));
+                    return;
+                }
+            }
+        } catch (SQLException e) {
+            System.out.println("Login failed: " + e.getMessage());
+            return;
+        }
+        System.out.println("Wrong username or password.");
     }
 }
