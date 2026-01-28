@@ -7,4 +7,8 @@ import java.util.List;
 
 public interface SessionRepository {
     List<Session> findAll(Connection connection) throws SQLException;
+
+    void add(Connection connection, Session session) throws SQLException;
+
+    int count(Connection connection) throws SQLException;
 }

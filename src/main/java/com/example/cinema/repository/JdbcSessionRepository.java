@@ -27,4 +27,28 @@ public class JdbcSessionRepository implements SessionRepository {
         }
         return sessions;
     }
+
+    @Override
+    public void add(Connection connection, Session session) throws SQLException {
+        String sql = "INSERT INTO sessions (movie_id, session_date, price, total_seats) VALUES (?, ?, ?, ?)";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, session.getMovieId());
+            statement.setTimestamp(2, java.sql.Timestamp.valueOf(session.getSessionDate()));
+            statement.setDouble(3, session.getPrice());
+            statement.setInt(4, session.getTotalSeats());
+            statement.executeUpdate();
+        }
+    }
+
+    @Override
+    public int count(Connection connection) throws SQLException {
+        String sql = "SELECT COUNT(*) FROM sessions";
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet rs = statement.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt(1);
+            }
+        }
+        return 0;
+    }
 }
