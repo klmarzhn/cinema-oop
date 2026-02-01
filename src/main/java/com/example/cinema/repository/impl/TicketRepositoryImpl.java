@@ -62,7 +62,7 @@ public class TicketRepositoryImpl implements TicketRepository {
     public List<TicketDetails> findDetailedByUser(Connection connection, int userId) throws SQLException {
         String sql = "SELECT t.id AS ticket_id, t.seat_number, t.purchase_date, " +
                 "s.session_date, s.price, " +
-                "m.title AS movie_title, m.genre AS movie_genre, " +
+                "m.title AS movie_title, m.category AS movie_category, " +
                 "u.name AS user_name, u.surname AS user_surname, u.username " +
                 "FROM tickets t " +
                 "JOIN sessions s ON t.session_id = s.id " +
@@ -82,7 +82,7 @@ public class TicketRepositoryImpl implements TicketRepository {
                             .sessionDate(rs.getTimestamp("session_date").toLocalDateTime())
                             .price(rs.getDouble("price"))
                             .movieTitle(rs.getString("movie_title"))
-                            .movieGenre(rs.getString("movie_genre"))
+                            .movieCategory(rs.getString("movie_category"))
                             .userName(rs.getString("user_name"))
                             .userSurname(rs.getString("user_surname"))
                             .username(rs.getString("username"))
@@ -98,7 +98,7 @@ public class TicketRepositoryImpl implements TicketRepository {
     public List<TicketDetails> findAllDetailed(Connection connection) throws SQLException {
         String sql = "SELECT t.id AS ticket_id, t.seat_number, t.purchase_date, " +
                 "s.session_date, s.price, " +
-                "m.title AS movie_title, m.genre AS movie_genre, " +
+                "m.title AS movie_title, m.category AS movie_category, " +
                 "u.name AS user_name, u.surname AS user_surname, u.username " +
                 "FROM tickets t " +
                 "JOIN sessions s ON t.session_id = s.id " +
@@ -116,7 +116,7 @@ public class TicketRepositoryImpl implements TicketRepository {
                         .sessionDate(rs.getTimestamp("session_date").toLocalDateTime())
                         .price(rs.getDouble("price"))
                         .movieTitle(rs.getString("movie_title"))
-                        .movieGenre(rs.getString("movie_genre"))
+                        .movieCategory(rs.getString("movie_category"))
                         .userName(rs.getString("user_name"))
                         .userSurname(rs.getString("user_surname"))
                         .username(rs.getString("username"))

@@ -11,7 +11,7 @@ public class TicketDetails {
     private LocalDateTime sessionDate;
     private double price;
     private String movieTitle;
-    private String movieGenre;
+    private String movieCategory;
     private String userName;
     private String userSurname;
     private String username;
@@ -53,8 +53,8 @@ public class TicketDetails {
             return this;
         }
 
-        public Builder movieGenre(String movieGenre) {
-            ticket.movieGenre = movieGenre;
+        public Builder movieCategory(String movieCategory) {
+            ticket.movieCategory = movieCategory;
             return this;
         }
 
@@ -100,5 +100,13 @@ public class TicketDetails {
 
     public void setUserSurname(String userSurname) {
         this.userSurname = userSurname;
+    }
+
+    public String getMovieCategory() {
+        return movieCategory;
+    }
+
+    public void setMovieCategory(String movieCategory) {
+        this.movieCategory = movieCategory;
     }
 }

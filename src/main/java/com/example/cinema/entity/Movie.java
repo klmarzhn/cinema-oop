@@ -6,6 +6,14 @@ import lombok.Data;
 public class Movie {
     private int id;
     private String title;
-    private String genre;
     private int durationMin;
+    private MovieCategory category;
+
+    public MovieCategory getCategory() {
+        return category;
+    }
+
+    public void setCategory(MovieCategory category) {
+        this.category = category;
+    }
 }

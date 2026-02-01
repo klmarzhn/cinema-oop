@@ -33,7 +33,6 @@ public class MyApplication {
                 repositoryFactory.createUserRepository(),
                 pricingStrategy
         );
-        service.seedMovies(connection);
         service.seedSessions(connection);
 
         User currentUser = null;

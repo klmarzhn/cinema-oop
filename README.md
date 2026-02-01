@@ -14,9 +14,17 @@
 - Role management:
   - Roles: `USER`, `MANAGER`, `ADMIN` with basic access checks in the CLI menu.
   - Manager/Admin can see all tickets; Admin can manage user roles.
+- Data validation:
+  - Centralized in `ValidationUtils` (names, username, password, positive integers).
+  - Applied in `SimpleCinemaService.register`, `login`, and `buyTicket`.
+- Entity categories:
+  - Movies have a `MovieCategory` (ACTION, DRAMA, SCI_FI, etc.).
+  - Stored in `movies.category` and displayed in `showMovies`.
 
 ## How to Run
 - `mvn -q exec:java`
 
 ## Database Note
 - Add a `role` column to `users` (string) and set a default value like `USER`.
+- Add a `category` column to `movies` (string) and set a default value like `GENERAL`.
+- The `genre` column is no longer used (can be dropped if it exists).

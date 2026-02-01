@@ -1,6 +1,7 @@
 package com.example.cinema.service;
 
 import com.example.cinema.entity.Movie;
+import com.example.cinema.entity.MovieCategory;
 import com.example.cinema.entity.Role;
 import com.example.cinema.entity.Session;
 import com.example.cinema.entity.Ticket;
@@ -47,16 +48,16 @@ public class SimpleCinemaService implements CinemaService {
             return;
         }
         List<Movie> movies = Arrays.asList(
-                createMovie("Inception", "Sci-Fi", 148),
-                createMovie("Interstellar", "Sci-Fi", 169),
-                createMovie("The Matrix", "Action", 136),
-                createMovie("The Godfather", "Crime", 175),
-                createMovie("Pulp Fiction", "Crime", 154),
-                createMovie("Spirited Away", "Animation", 125),
-                createMovie("Parasite", "Thriller", 132),
-                createMovie("The Dark Knight", "Action", 152),
-                createMovie("La La Land", "Drama", 128),
-                createMovie("Toy Story", "Animation", 81)
+                createMovie("Inception", MovieCategory.SCI_FI, 148),
+                createMovie("Interstellar", MovieCategory.SCI_FI, 169),
+                createMovie("The Matrix", MovieCategory.ACTION, 136),
+                createMovie("The Godfather", MovieCategory.CRIME, 175),
+                createMovie("Pulp Fiction", MovieCategory.CRIME, 154),
+                createMovie("Spirited Away", MovieCategory.ANIMATION, 125),
+                createMovie("Parasite", MovieCategory.THRILLER, 132),
+                createMovie("The Dark Knight", MovieCategory.ACTION, 152),
+                createMovie("La La Land", MovieCategory.DRAMA, 128),
+                createMovie("Toy Story", MovieCategory.ANIMATION, 81)
         );
         movies.forEach(movie -> addMovieSafe(connection, movie));
         System.out.println("Movies seeded.");
@@ -87,7 +88,7 @@ public class SimpleCinemaService implements CinemaService {
         System.out.println("Movies:");
         movies.forEach(movie -> {
             System.out.println(movie.getId() + ". " + movie.getTitle() + " ("
-                    + movie.getGenre() + ", " + movie.getDurationMin() + " min)");
+                    + movie.getCategory() + ", " + movie.getDurationMin() + " min)");
         });
     }
 
@@ -216,11 +217,11 @@ public class SimpleCinemaService implements CinemaService {
         printTickets(tickets);
     }
 
-    private Movie createMovie(String title, String genre, int durationMin) {
+    private Movie createMovie(String title, MovieCategory category, int durationMin) {
         Movie movie = new Movie();
         movie.setTitle(title);
-        movie.setGenre(genre);
         movie.setDurationMin(durationMin);
+        movie.setCategory(category);
         return movie;
     }
 
@@ -232,6 +233,7 @@ public class SimpleCinemaService implements CinemaService {
         session.setTotalSeats(totalSeats);
         return session;
     }
+
 
     @Override
     public void showAllTickets(Connection connection) throws SQLException {
@@ -279,7 +281,7 @@ public class SimpleCinemaService implements CinemaService {
 
     private void printTickets(List<TicketDetails> tickets) {
         tickets.forEach(ticket -> System.out.println(ticket.getTicketId() + ". " + ticket.getMovieTitle()
-                + " (" + ticket.getMovieGenre() + ")"
+                + " (" + ticket.getMovieCategory() + ")"
                 + " | session=" + ticket.getSessionDate()
                 + " | seat=" + ticket.getSeatNumber()
                 + " | price=$" + ticket.getPrice()
