@@ -1,12 +1,14 @@
-package com.example.cinema.repository;
+package com.example.cinema.repository.impl;
 
 import com.example.cinema.entity.User;
+import com.example.cinema.repository.UserRepository;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class JdbcUserRepository implements UserRepository {
+public class UserRepositoryImpl implements UserRepository {
     @Override
     public void add(Connection connection, User user) throws SQLException {
         String sql = "INSERT INTO users (name, surname, username, password) VALUES (?, ?, ?, ?)";

@@ -1,6 +1,9 @@
-package com.example.cinema.repository;
+package com.example.cinema.repository.impl;
 
 import com.example.cinema.entity.Ticket;
+import com.example.cinema.entity.TicketDetails;
+import com.example.cinema.repository.TicketRepository;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -9,7 +12,7 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcTicketRepository implements TicketRepository {
+public class TicketRepositoryImpl implements TicketRepository {
     @Override
     public boolean isSeatTaken(Connection connection, int sessionId, int seatNumber) throws SQLException {
         String sql = "SELECT 1 FROM tickets WHERE session_id = ? AND seat_number = ?";
@@ -48,6 +51,41 @@ public class JdbcTicketRepository implements TicketRepository {
                     ticket.setSessionId(rs.getInt("session_id"));
                     ticket.setSeatNumber(rs.getInt("seat_number"));
                     ticket.setPurchaseDate(rs.getTimestamp("purchase_date").toLocalDateTime());
+                    tickets.add(ticket);
+                }
+            }
+        }
+        return tickets;
+    }
+
+    @Override
+    public List<TicketDetails> findDetailedByUser(Connection connection, int userId) throws SQLException {
+        String sql = "SELECT t.id AS ticket_id, t.seat_number, t.purchase_date, " +
+                "s.session_date, s.price, " +
+                "m.title AS movie_title, m.genre AS movie_genre, " +
+                "u.name AS user_name, u.surname AS user_surname, u.username " +
+                "FROM tickets t " +
+                "JOIN sessions s ON t.session_id = s.id " +
+                "JOIN movies m ON s.movie_id = m.id " +
+                "JOIN users u ON t.user_id = u.id " +
+                "WHERE t.user_id = ? " +
+                "ORDER BY t.id";
+        List<TicketDetails> tickets = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, userId);
+            try (ResultSet rs = statement.executeQuery()) {
+                while (rs.next()) {
+                    TicketDetails ticket = new TicketDetails();
+                    ticket.setTicketId(rs.getInt("ticket_id"));
+                    ticket.setSeatNumber(rs.getInt("seat_number"));
+                    ticket.setPurchaseDate(rs.getTimestamp("purchase_date").toLocalDateTime());
+                    ticket.setSessionDate(rs.getTimestamp("session_date").toLocalDateTime());
+                    ticket.setPrice(rs.getDouble("price"));
+                    ticket.setMovieTitle(rs.getString("movie_title"));
+                    ticket.setMovieGenre(rs.getString("movie_genre"));
+                    ticket.setUserName(rs.getString("user_name"));
+                    ticket.setUserSurname(rs.getString("user_surname"));
+                    ticket.setUsername(rs.getString("username"));
                     tickets.add(ticket);
                 }
             }

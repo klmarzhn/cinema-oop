@@ -1,6 +1,8 @@
-package com.example.cinema.repository;
+package com.example.cinema.repository.impl;
 
 import com.example.cinema.entity.Movie;
+import com.example.cinema.repository.MovieRepository;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,7 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcMovieRepository implements MovieRepository {
+public class MovieRepositoryImpl implements MovieRepository {
     @Override
     public List<Movie> findAll(Connection connection) throws SQLException {
         String sql = "SELECT id, title, genre, duration_min FROM movies ORDER BY id";

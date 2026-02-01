@@ -1,6 +1,8 @@
-package com.example.cinema.repository;
+package com.example.cinema.repository.impl;
 
 import com.example.cinema.entity.Session;
+import com.example.cinema.repository.SessionRepository;
+
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -8,7 +10,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class JdbcSessionRepository implements SessionRepository {
+public class SessionRepositoryImpl implements SessionRepository {
     @Override
     public List<Session> findAll(Connection connection) throws SQLException {
         String sql = "SELECT id, movie_id, session_date, price, total_seats FROM sessions ORDER BY id";

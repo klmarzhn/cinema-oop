@@ -1,10 +1,10 @@
 package com.example.cinema.app;
 
 import com.example.cinema.entity.User;
-import com.example.cinema.repository.JdbcMovieRepository;
-import com.example.cinema.repository.JdbcSessionRepository;
-import com.example.cinema.repository.JdbcTicketRepository;
-import com.example.cinema.repository.JdbcUserRepository;
+import com.example.cinema.repository.impl.MovieRepositoryImpl;
+import com.example.cinema.repository.impl.SessionRepositoryImpl;
+import com.example.cinema.repository.impl.TicketRepositoryImpl;
+import com.example.cinema.repository.impl.UserRepositoryImpl;
 import com.example.cinema.service.CinemaService;
 import com.example.cinema.service.SimpleCinemaService;
 import java.sql.Connection;
@@ -28,10 +28,10 @@ public class MyApplication {
     private static void runApp(Connection connection) throws SQLException {
         Scanner scanner = new Scanner(System.in);
         CinemaService service = new SimpleCinemaService(
-                new JdbcMovieRepository(),
-                new JdbcSessionRepository(),
-                new JdbcTicketRepository(),
-                new JdbcUserRepository()
+                new MovieRepositoryImpl(),
+                new SessionRepositoryImpl(),
+                new TicketRepositoryImpl(),
+                new UserRepositoryImpl()
         );
         service.seedMovies(connection);
         service.seedSessions(connection);

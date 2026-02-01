@@ -3,6 +3,7 @@ package com.example.cinema.service;
 import com.example.cinema.entity.Movie;
 import com.example.cinema.entity.Session;
 import com.example.cinema.entity.Ticket;
+import com.example.cinema.entity.TicketDetails;
 import com.example.cinema.entity.User;
 import com.example.cinema.repository.MovieRepository;
 import com.example.cinema.repository.SessionRepository;
@@ -171,11 +172,17 @@ public class SimpleCinemaService implements CinemaService {
 
     @Override
     public void showMyTickets(Connection connection, int userId) throws SQLException {
-        List<Ticket> tickets = ticketRepository.findByUser(connection, userId);
+        List<TicketDetails> tickets = ticketRepository.findDetailedByUser(connection, userId);
         System.out.println("My tickets:");
-        for (Ticket ticket : tickets) {
-            System.out.println(ticket.getId() + ". session_id=" + ticket.getSessionId()
-                    + " seat=" + ticket.getSeatNumber() + " date=" + ticket.getPurchaseDate());
+        for (TicketDetails ticket : tickets) {
+            System.out.println(ticket.getTicketId() + ". " + ticket.getMovieTitle()
+                    + " (" + ticket.getMovieGenre() + ")"
+                    + " | session=" + ticket.getSessionDate()
+                    + " | seat=" + ticket.getSeatNumber()
+                    + " | price=$" + ticket.getPrice()
+                    + " | buyer=" + ticket.getUsername() + " " + ticket.getUserSurname()
+                    + " (" + ticket.getUsername() + ")"
+                    + " | purchased=" + ticket.getPurchaseDate());
         }
     }
 
