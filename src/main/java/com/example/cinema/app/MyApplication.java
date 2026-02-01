@@ -1,24 +1,19 @@
 package com.example.cinema.app;
 
+import com.example.cinema.config.DbConnectionManager;
 import com.example.cinema.entity.User;
-import com.example.cinema.repository.impl.MovieRepositoryImpl;
-import com.example.cinema.repository.impl.SessionRepositoryImpl;
-import com.example.cinema.repository.impl.TicketRepositoryImpl;
-import com.example.cinema.repository.impl.UserRepositoryImpl;
+import com.example.cinema.factory.RepositoryFactory;
+import com.example.cinema.pricing.PricingStrategy;
+import com.example.cinema.pricing.TieredPricingStrategy;
 import com.example.cinema.service.CinemaService;
 import com.example.cinema.service.SimpleCinemaService;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.SQLException;
 import java.util.Scanner;
 
 public class MyApplication {
-    private static final String DB_URL = "jdbc:postgresql://localhost:5432/cinema-db";
-    private static final String DB_USER = "postgres";
-    private static final String DB_PASSWORD = "1234";
-
     public static void main(String[] args) {
-        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
+        try (Connection connection = DbConnectionManager.getInstance().getConnection()) {
             runApp(connection);
         } catch (SQLException e) {
             System.out.println("Database error: " + e.getMessage());
@@ -27,11 +22,14 @@ public class MyApplication {
 
     private static void runApp(Connection connection) throws SQLException {
         Scanner scanner = new Scanner(System.in);
+        RepositoryFactory repositoryFactory = new RepositoryFactory();
+        PricingStrategy pricingStrategy = new TieredPricingStrategy();
         CinemaService service = new SimpleCinemaService(
-                new MovieRepositoryImpl(),
-                new SessionRepositoryImpl(),
-                new TicketRepositoryImpl(),
-                new UserRepositoryImpl()
+                repositoryFactory.createMovieRepository(),
+                repositoryFactory.createSessionRepository(),
+                repositoryFactory.createTicketRepository(),
+                repositoryFactory.createUserRepository(),
+                pricingStrategy
         );
         service.seedMovies(connection);
         service.seedSessions(connection);

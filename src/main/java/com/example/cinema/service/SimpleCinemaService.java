@@ -4,6 +4,7 @@ import com.example.cinema.entity.Movie;
 import com.example.cinema.entity.Session;
 import com.example.cinema.entity.Ticket;
 import com.example.cinema.entity.TicketDetails;
+import com.example.cinema.pricing.PricingStrategy;
 import com.example.cinema.entity.User;
 import com.example.cinema.repository.MovieRepository;
 import com.example.cinema.repository.SessionRepository;
@@ -21,17 +22,20 @@ public class SimpleCinemaService implements CinemaService {
     private final SessionRepository sessionRepository;
     private final TicketRepository ticketRepository;
     private final UserRepository userRepository;
+    private final PricingStrategy pricingStrategy;
 
     public SimpleCinemaService(
             MovieRepository movieRepository,
             SessionRepository sessionRepository,
             TicketRepository ticketRepository,
-            UserRepository userRepository
+            UserRepository userRepository,
+            PricingStrategy pricingStrategy
     ) {
         this.movieRepository = movieRepository;
         this.sessionRepository = sessionRepository;
         this.ticketRepository = ticketRepository;
         this.userRepository = userRepository;
+        this.pricingStrategy = pricingStrategy;
     }
 
     @Override
@@ -77,7 +81,7 @@ public class SimpleCinemaService implements CinemaService {
             LocalDateTime sessionTime = baseTime
                     .plusDays(i / 3)
                     .plusHours((i % 3) * 3L);
-            double price = 10.0 + (i % 3) * 2.5;
+            double price = pricingStrategy.priceForIndex(i);
             Session session = createSession(movie.getId(), sessionTime, price, 60);
             sessionRepository.add(connection, session);
         }

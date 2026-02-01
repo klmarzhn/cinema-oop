@@ -16,6 +16,68 @@ public class TicketDetails {
     private String userSurname;
     private String username;
 
+    public static Builder builder() {
+        return new Builder();
+    }
+
+    public static class Builder {
+        private final TicketDetails ticket = new TicketDetails();
+
+        public Builder ticketId(int ticketId) {
+            ticket.ticketId = ticketId;
+            return this;
+        }
+
+        public Builder seatNumber(int seatNumber) {
+            ticket.seatNumber = seatNumber;
+            return this;
+        }
+
+        public Builder purchaseDate(LocalDateTime purchaseDate) {
+            ticket.purchaseDate = purchaseDate;
+            return this;
+        }
+
+        public Builder sessionDate(LocalDateTime sessionDate) {
+            ticket.sessionDate = sessionDate;
+            return this;
+        }
+
+        public Builder price(double price) {
+            ticket.price = price;
+            return this;
+        }
+
+        public Builder movieTitle(String movieTitle) {
+            ticket.movieTitle = movieTitle;
+            return this;
+        }
+
+        public Builder movieGenre(String movieGenre) {
+            ticket.movieGenre = movieGenre;
+            return this;
+        }
+
+        public Builder userName(String userName) {
+            ticket.userName = userName;
+            return this;
+        }
+
+        public Builder userSurname(String userSurname) {
+            ticket.userSurname = userSurname;
+            return this;
+        }
+
+        public Builder username(String username) {
+            ticket.username = username;
+            return this;
+        }
+
+        public TicketDetails build() {
+            return ticket;
+        }
+    }
+
     public String getUsername() {
         return username;
     }

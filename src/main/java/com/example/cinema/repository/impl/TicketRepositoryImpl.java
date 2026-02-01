@@ -75,17 +75,18 @@ public class TicketRepositoryImpl implements TicketRepository {
             statement.setInt(1, userId);
             try (ResultSet rs = statement.executeQuery()) {
                 while (rs.next()) {
-                    TicketDetails ticket = new TicketDetails();
-                    ticket.setTicketId(rs.getInt("ticket_id"));
-                    ticket.setSeatNumber(rs.getInt("seat_number"));
-                    ticket.setPurchaseDate(rs.getTimestamp("purchase_date").toLocalDateTime());
-                    ticket.setSessionDate(rs.getTimestamp("session_date").toLocalDateTime());
-                    ticket.setPrice(rs.getDouble("price"));
-                    ticket.setMovieTitle(rs.getString("movie_title"));
-                    ticket.setMovieGenre(rs.getString("movie_genre"));
-                    ticket.setUserName(rs.getString("user_name"));
-                    ticket.setUserSurname(rs.getString("user_surname"));
-                    ticket.setUsername(rs.getString("username"));
+                    TicketDetails ticket = TicketDetails.builder()
+                            .ticketId(rs.getInt("ticket_id"))
+                            .seatNumber(rs.getInt("seat_number"))
+                            .purchaseDate(rs.getTimestamp("purchase_date").toLocalDateTime())
+                            .sessionDate(rs.getTimestamp("session_date").toLocalDateTime())
+                            .price(rs.getDouble("price"))
+                            .movieTitle(rs.getString("movie_title"))
+                            .movieGenre(rs.getString("movie_genre"))
+                            .userName(rs.getString("user_name"))
+                            .userSurname(rs.getString("user_surname"))
+                            .username(rs.getString("username"))
+                            .build();
                     tickets.add(ticket);
                 }
             }
