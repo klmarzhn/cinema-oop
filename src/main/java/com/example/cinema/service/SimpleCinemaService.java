@@ -16,6 +16,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Scanner;
+import java.util.stream.IntStream;
 
 public class SimpleCinemaService implements CinemaService {
     private final MovieRepository movieRepository;
@@ -55,9 +56,7 @@ public class SimpleCinemaService implements CinemaService {
                 createMovie("La La Land", "Drama", 128),
                 createMovie("Toy Story", "Animation", 81)
         );
-        for (Movie movie : movies) {
-            movieRepository.add(connection, movie);
-        }
+        movies.forEach(movie -> addMovieSafe(connection, movie));
         System.out.println("Movies seeded.");
     }
 
@@ -76,15 +75,7 @@ public class SimpleCinemaService implements CinemaService {
                 .withSecond(0)
                 .withNano(0)
                 .plusHours(2);
-        for (int i = 0; i < movies.size(); i++) {
-            Movie movie = movies.get(i);
-            LocalDateTime sessionTime = baseTime
-                    .plusDays(i / 3)
-                    .plusHours((i % 3) * 3L);
-            double price = pricingStrategy.priceForIndex(i);
-            Session session = createSession(movie.getId(), sessionTime, price, 60);
-            sessionRepository.add(connection, session);
-        }
+        IntStream.range(0, movies.size()).forEach(i -> addSessionSafe(connection, movies, baseTime, i));
         System.out.println("Sessions seeded.");
     }
 
@@ -92,20 +83,20 @@ public class SimpleCinemaService implements CinemaService {
     public void showMovies(Connection connection) throws SQLException {
         List<Movie> movies = movieRepository.findAll(connection);
         System.out.println("Movies:");
-        for (Movie movie : movies) {
+        movies.forEach(movie -> {
             System.out.println(movie.getId() + ". " + movie.getTitle() + " ("
                     + movie.getGenre() + ", " + movie.getDurationMin() + " min)");
-        }
+        });
     }
 
     @Override
     public void showSessions(Connection connection) throws SQLException {
         List<Session> sessions = sessionRepository.findAll(connection);
         System.out.println("Sessions:");
-        for (Session session : sessions) {
+        sessions.forEach(session -> {
             System.out.println(session.getId() + ". movie_id=" + session.getMovieId()
                     + " | " + session.getSessionDate() + " | $" + session.getPrice());
-        }
+        });
     }
 
     @Override
@@ -178,16 +169,16 @@ public class SimpleCinemaService implements CinemaService {
     public void showMyTickets(Connection connection, int userId) throws SQLException {
         List<TicketDetails> tickets = ticketRepository.findDetailedByUser(connection, userId);
         System.out.println("My tickets:");
-        for (TicketDetails ticket : tickets) {
+        tickets.forEach(ticket -> {
             System.out.println(ticket.getTicketId() + ". " + ticket.getMovieTitle()
                     + " (" + ticket.getMovieGenre() + ")"
                     + " | session=" + ticket.getSessionDate()
                     + " | seat=" + ticket.getSeatNumber()
                     + " | price=$" + ticket.getPrice()
-                    + " | buyer=" + ticket.getUsername() + " " + ticket.getUserSurname()
+                    + " | buyer=" + ticket.getUserName() + " " + ticket.getUserSurname()
                     + " (" + ticket.getUsername() + ")"
                     + " | purchased=" + ticket.getPurchaseDate());
-        }
+        });
     }
 
     private Movie createMovie(String title, String genre, int durationMin) {
@@ -205,5 +196,27 @@ public class SimpleCinemaService implements CinemaService {
         session.setPrice(price);
         session.setTotalSeats(totalSeats);
         return session;
+    }
+
+    private void addMovieSafe(Connection connection, Movie movie) {
+        try {
+            movieRepository.add(connection, movie);
+        } catch (SQLException e) {
+            System.out.println("Failed to add movie: " + e.getMessage());
+        }
+    }
+
+    private void addSessionSafe(Connection connection, List<Movie> movies, LocalDateTime baseTime, int index) {
+        Movie movie = movies.get(index);
+        LocalDateTime sessionTime = baseTime
+                .plusDays(index / 3)
+                .plusHours((index % 3) * 3L);
+        double price = pricingStrategy.priceForIndex(index);
+        Session session = createSession(movie.getId(), sessionTime, price, 60);
+        try {
+            sessionRepository.add(connection, session);
+        } catch (SQLException e) {
+            System.out.println("Failed to add session: " + e.getMessage());
+        }
     }
 }
