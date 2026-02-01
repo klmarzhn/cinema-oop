@@ -11,6 +11,7 @@ import com.example.cinema.repository.MovieRepository;
 import com.example.cinema.repository.SessionRepository;
 import com.example.cinema.repository.TicketRepository;
 import com.example.cinema.repository.UserRepository;
+import com.example.cinema.validation.ValidationUtils;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDateTime;
@@ -111,6 +112,23 @@ public class SimpleCinemaService implements CinemaService {
         System.out.print("Password: ");
         String password = scanner.nextLine().trim();
 
+        if (!ValidationUtils.isValidName(name)) {
+            System.out.println("Invalid name. Use 2-50 letters/spaces.");
+            return;
+        }
+        if (!ValidationUtils.isValidName(surname)) {
+            System.out.println("Invalid surname. Use 2-50 letters/spaces.");
+            return;
+        }
+        if (!ValidationUtils.isValidUsername(username)) {
+            System.out.println("Invalid username. Use 3-20 letters/numbers/_");
+            return;
+        }
+        if (!ValidationUtils.isValidPassword(password)) {
+            System.out.println("Invalid password. Minimum 4 characters.");
+            return;
+        }
+
         User user = new User();
         user.setName(name);
         user.setSurname(surname);
@@ -133,6 +151,11 @@ public class SimpleCinemaService implements CinemaService {
         System.out.print("Password: ");
         String password = scanner.nextLine().trim();
 
+        if (ValidationUtils.isBlank(username) || ValidationUtils.isBlank(password)) {
+            System.out.println("Username and password are required.");
+            return null;
+        }
+
         try {
             User user = userRepository.findByCredentials(connection, username, password);
             if (user != null) {
@@ -149,9 +172,28 @@ public class SimpleCinemaService implements CinemaService {
     @Override
     public void buyTicket(Connection connection, Scanner scanner, int userId) throws SQLException {
         System.out.print("Session id: ");
-        int sessionId = Integer.parseInt(scanner.nextLine().trim());
+        Integer sessionId = ValidationUtils.parsePositiveInt(scanner.nextLine());
         System.out.print("Seat number: ");
-        int seatNumber = Integer.parseInt(scanner.nextLine().trim());
+        Integer seatNumber = ValidationUtils.parsePositiveInt(scanner.nextLine());
+
+        if (sessionId == null) {
+            System.out.println("Invalid session id.");
+            return;
+        }
+        if (seatNumber == null) {
+            System.out.println("Invalid seat number.");
+            return;
+        }
+
+        Session session = sessionRepository.findById(connection, sessionId);
+        if (session == null) {
+            System.out.println("Session not found.");
+            return;
+        }
+        if (seatNumber > session.getTotalSeats()) {
+            System.out.println("Invalid seat number. Max seats: " + session.getTotalSeats());
+            return;
+        }
 
         if (ticketRepository.isSeatTaken(connection, sessionId, seatNumber)) {
             System.out.println("This seat is already taken.");

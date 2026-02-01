@@ -31,6 +31,26 @@ public class SessionRepositoryImpl implements SessionRepository {
     }
 
     @Override
+    public Session findById(Connection connection, int id) throws SQLException {
+        String sql = "SELECT id, movie_id, session_date, price, total_seats FROM sessions WHERE id = ?";
+        try (PreparedStatement statement = connection.prepareStatement(sql)) {
+            statement.setInt(1, id);
+            try (ResultSet rs = statement.executeQuery()) {
+                if (rs.next()) {
+                    Session session = new Session();
+                    session.setId(rs.getInt("id"));
+                    session.setMovieId(rs.getInt("movie_id"));
+                    session.setSessionDate(rs.getTimestamp("session_date").toLocalDateTime());
+                    session.setPrice(rs.getDouble("price"));
+                    session.setTotalSeats(rs.getInt("total_seats"));
+                    return session;
+                }
+            }
+        }
+        return null;
+    }
+
+    @Override
     public void add(Connection connection, Session session) throws SQLException {
         String sql = "INSERT INTO sessions (movie_id, session_date, price, total_seats) VALUES (?, ?, ?, ?)";
         try (PreparedStatement statement = connection.prepareStatement(sql)) {
