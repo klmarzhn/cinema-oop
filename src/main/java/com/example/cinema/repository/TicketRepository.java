@@ -14,4 +14,6 @@ public interface TicketRepository {
     List<Ticket> findByUser(Connection connection, int userId) throws SQLException;
 
     List<TicketDetails> findDetailedByUser(Connection connection, int userId) throws SQLException;
+
+    List<TicketDetails> findAllDetailed(Connection connection) throws SQLException;
 }

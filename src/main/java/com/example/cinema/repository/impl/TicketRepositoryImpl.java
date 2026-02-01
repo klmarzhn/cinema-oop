@@ -93,4 +93,37 @@ public class TicketRepositoryImpl implements TicketRepository {
         }
         return tickets;
     }
+
+    @Override
+    public List<TicketDetails> findAllDetailed(Connection connection) throws SQLException {
+        String sql = "SELECT t.id AS ticket_id, t.seat_number, t.purchase_date, " +
+                "s.session_date, s.price, " +
+                "m.title AS movie_title, m.genre AS movie_genre, " +
+                "u.name AS user_name, u.surname AS user_surname, u.username " +
+                "FROM tickets t " +
+                "JOIN sessions s ON t.session_id = s.id " +
+                "JOIN movies m ON s.movie_id = m.id " +
+                "JOIN users u ON t.user_id = u.id " +
+                "ORDER BY t.id";
+        List<TicketDetails> tickets = new ArrayList<>();
+        try (PreparedStatement statement = connection.prepareStatement(sql);
+             ResultSet rs = statement.executeQuery()) {
+            while (rs.next()) {
+                TicketDetails ticket = TicketDetails.builder()
+                        .ticketId(rs.getInt("ticket_id"))
+                        .seatNumber(rs.getInt("seat_number"))
+                        .purchaseDate(rs.getTimestamp("purchase_date").toLocalDateTime())
+                        .sessionDate(rs.getTimestamp("session_date").toLocalDateTime())
+                        .price(rs.getDouble("price"))
+                        .movieTitle(rs.getString("movie_title"))
+                        .movieGenre(rs.getString("movie_genre"))
+                        .userName(rs.getString("user_name"))
+                        .userSurname(rs.getString("user_surname"))
+                        .username(rs.getString("username"))
+                        .build();
+                tickets.add(ticket);
+            }
+        }
+        return tickets;
+    }
 }

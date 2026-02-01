@@ -1,6 +1,7 @@
 package com.example.cinema.service;
 
 import com.example.cinema.entity.Movie;
+import com.example.cinema.entity.Role;
 import com.example.cinema.entity.Session;
 import com.example.cinema.entity.Ticket;
 import com.example.cinema.entity.TicketDetails;
@@ -115,6 +116,7 @@ public class SimpleCinemaService implements CinemaService {
         user.setSurname(surname);
         user.setUsername(username);
         user.setPassword(password);
+        user.setRole(Role.USER);
 
         try {
             userRepository.add(connection, user);
@@ -169,16 +171,7 @@ public class SimpleCinemaService implements CinemaService {
     public void showMyTickets(Connection connection, int userId) throws SQLException {
         List<TicketDetails> tickets = ticketRepository.findDetailedByUser(connection, userId);
         System.out.println("My tickets:");
-        tickets.forEach(ticket -> {
-            System.out.println(ticket.getTicketId() + ". " + ticket.getMovieTitle()
-                    + " (" + ticket.getMovieGenre() + ")"
-                    + " | session=" + ticket.getSessionDate()
-                    + " | seat=" + ticket.getSeatNumber()
-                    + " | price=$" + ticket.getPrice()
-                    + " | buyer=" + ticket.getUserName() + " " + ticket.getUserSurname()
-                    + " (" + ticket.getUsername() + ")"
-                    + " | purchased=" + ticket.getPurchaseDate());
-        });
+        printTickets(tickets);
     }
 
     private Movie createMovie(String title, String genre, int durationMin) {
@@ -196,6 +189,61 @@ public class SimpleCinemaService implements CinemaService {
         session.setPrice(price);
         session.setTotalSeats(totalSeats);
         return session;
+    }
+
+    @Override
+    public void showAllTickets(Connection connection) throws SQLException {
+        List<TicketDetails> tickets = ticketRepository.findAllDetailed(connection);
+        System.out.println("All tickets:");
+        printTickets(tickets);
+    }
+
+    @Override
+    public void showUsers(Connection connection) throws SQLException {
+        List<User> users = userRepository.findAll(connection);
+        System.out.println("Users:");
+        users.forEach(user -> System.out.println(user.getId() + ". "
+                + user.getUsername() + " | " + user.getName() + " " + user.getSurname()
+                + " | role=" + user.getRole()));
+    }
+
+    @Override
+    public void changeUserRole(Connection connection, Scanner scanner) {
+        try {
+            showUsers(connection);
+        } catch (SQLException e) {
+            System.out.println("Failed to load users: " + e.getMessage());
+            return;
+        }
+        System.out.print("User id: ");
+        String idInput = scanner.nextLine().trim();
+        System.out.print("New role (USER/MANAGER/ADMIN): ");
+        String roleInput = scanner.nextLine().trim();
+        Role role = Role.parse(roleInput);
+        if (role == null) {
+            System.out.println("Unknown role.");
+            return;
+        }
+        try {
+            int userId = Integer.parseInt(idInput);
+            userRepository.updateRole(connection, userId, role);
+            System.out.println("Role updated.");
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid user id.");
+        } catch (SQLException e) {
+            System.out.println("Failed to update role: " + e.getMessage());
+        }
+    }
+
+    private void printTickets(List<TicketDetails> tickets) {
+        tickets.forEach(ticket -> System.out.println(ticket.getTicketId() + ". " + ticket.getMovieTitle()
+                + " (" + ticket.getMovieGenre() + ")"
+                + " | session=" + ticket.getSessionDate()
+                + " | seat=" + ticket.getSeatNumber()
+                + " | price=$" + ticket.getPrice()
+                + " | buyer=" + ticket.getUserName() + " " + ticket.getUserSurname()
+                + " (" + ticket.getUsername() + ")"
+                + " | purchased=" + ticket.getPurchaseDate()));
     }
 
     private void addMovieSafe(Connection connection, Movie movie) {

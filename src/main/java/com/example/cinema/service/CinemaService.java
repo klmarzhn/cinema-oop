@@ -21,4 +21,10 @@ public interface CinemaService {
     void buyTicket(Connection connection, Scanner scanner, int userId) throws SQLException;
 
     void showMyTickets(Connection connection, int userId) throws SQLException;
+
+    void showAllTickets(Connection connection) throws SQLException;
+
+    void showUsers(Connection connection) throws SQLException;
+
+    void changeUserRole(Connection connection, Scanner scanner);
 }

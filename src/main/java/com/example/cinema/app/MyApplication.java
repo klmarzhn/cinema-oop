@@ -2,9 +2,11 @@ package com.example.cinema.app;
 
 import com.example.cinema.config.DbConnectionManager;
 import com.example.cinema.entity.User;
+import com.example.cinema.entity.Role;
 import com.example.cinema.factory.RepositoryFactory;
 import com.example.cinema.pricing.PricingStrategy;
 import com.example.cinema.pricing.TieredPricingStrategy;
+import com.example.cinema.security.AccessControl;
 import com.example.cinema.service.CinemaService;
 import com.example.cinema.service.SimpleCinemaService;
 import java.sql.Connection;
@@ -57,12 +59,19 @@ public class MyApplication {
                 }
             } else {
                 System.out.println();
-                System.out.println("Logged in as: " + currentUser.getUsername());
+                System.out.println("Logged in as: " + currentUser.getUsername()
+                        + " (" + currentUser.getRole() + ")");
                 System.out.println("1. Show movies");
                 System.out.println("2. Show sessions");
                 System.out.println("3. Buy ticket");
                 System.out.println("4. My tickets");
                 System.out.println("5. Logout");
+                if (AccessControl.hasRole(currentUser, Role.MANAGER, Role.ADMIN)) {
+                    System.out.println("6. All tickets (manager/admin)");
+                }
+                if (AccessControl.hasRole(currentUser, Role.ADMIN)) {
+                    System.out.println("7. Manage roles (admin)");
+                }
                 System.out.println("0. Exit");
                 System.out.print("Choose: ");
                 String choice = scanner.nextLine().trim();
@@ -78,6 +87,18 @@ public class MyApplication {
                 } else if (choice.equals("5")) {
                     currentUser = null;
                     System.out.println("Logged out.");
+                } else if (choice.equals("6")) {
+                    if (AccessControl.hasRole(currentUser, Role.MANAGER, Role.ADMIN)) {
+                        service.showAllTickets(connection);
+                    } else {
+                        System.out.println("Access denied.");
+                    }
+                } else if (choice.equals("7")) {
+                    if (AccessControl.hasRole(currentUser, Role.ADMIN)) {
+                        service.changeUserRole(connection, scanner);
+                    } else {
+                        System.out.println("Access denied.");
+                    }
                 } else if (choice.equals("0")) {
                     break;
                 }
